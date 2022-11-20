@@ -1,0 +1,71 @@
+
+docker ps -a
+docker stop <containerid>
+docker rm <containerid>
+docker images
+docker --version
+
+
+Python
+docker build -t mypyweb .
+docker run --name webapp -p 8080:4000 mypyweb
+docker run --name webapp -p 8080:4000 -e NAME="Dude" mypyweb
+
+
+java
+mkdir  java-docker-app
+// Hello.java
+
+class Hello{
+public static void main(String[] args){
+System.out.println("This is java app \n by using Docker");
+}
+}
+
+// Dockerfile
+
+FROM java:8
+COPY . /var/www/java
+WORKDIR /var/www/java
+RUN javac Hello.java
+CMD ["java", "Hello"]
+
+cd   java-docker-app
+$docker build -t java-app .
+
+ $docker run java-app
+
+
+java using jar and war file
+
+Dockerfile
+FROM java:8-jdk-alpine
+COPY ./build/libs/nasapicture-0.0.1-SNAPSHOT.war /usr/app/
+WORKDIR /usr/app
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "nasapicture-0.0.1-SNAPSHOT.war"]
+
+FROM java:8-jdk-alpine— with this line we tell Docker that our image will be based on another image that is available on public repository
+ (Docker Hub). This image was prepared by someone else and contains all necessary dependencies that we would need to run any
+  Java application.
+
+  COPY ./build/libs/nasapicture-0.0.1-SNAPSHOT.war /usr/app/ —with this step we
+   copy-paste something from one directory to another.
+   First argument after COPY is a path of an application that we want to put into container.
+   I’m using .war file because my project is a web application, but you if yours is a standard .jar app go with that.
+   The second parameter, /usr/app/ , is a directory in a container where we put the app.
+
+   WORKDIR /usr/app — here we instruct Docker to use /usr/app folder as a root, otherwise in each following command
+   we would need to provide the full path to the resource.
+
+   EXPOSE 8080 — with it we inform Docker that a container will listen to specific port
+
+   ENTRYPOINT ["java", “-jar", “nasapicture-0.0.1-SNAPSHOT.war"] — in the last command we tell Docker to run the application,
+   where first value is a command and the last two are parameters.
+
+go to folder where Dockerfile is located and when you’re in there build an image with following command
+   $docker build -t nasa-picture .
+
+   $docker run -p 3333:8080 nasa-picture
+
+   Container has been created and it’s running, and to test it enter following URL in your browser — http://localhost:3333/
